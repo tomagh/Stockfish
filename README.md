@@ -1,3 +1,7 @@
+This fork enables compiling Stockfish as a Swift Package library instead of an executable by redirecting std::cout to a std::streambuf.
+
+-------------------------------------
+
 <div align="center">
 
   [![Stockfish][stockfish128-logo]][website-link]

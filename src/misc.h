@@ -110,11 +110,14 @@ enum SyncCout {
 };
 std::ostream& operator<<(std::ostream&, SyncCout);
 
-#define sync_cout std::cout << IO_LOCK
+#define sync_cout *g_output << IO_LOCK
 #define sync_endl std::endl << IO_UNLOCK
 
-void sync_cout_start();
-void sync_cout_end();
+
+extern std::istream* g_input;
+extern std::ostream* g_output;
+
+void setup_global_io(std::istream& input, std::ostream& output);
 
 // True if and only if the binary is compiled on a little-endian machine
 static inline const union {

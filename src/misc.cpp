@@ -401,8 +401,13 @@ std::ostream& operator<<(std::ostream& os, SyncCout sc) {
     return os;
 }
 
-void sync_cout_start() { std::cout << IO_LOCK; }
-void sync_cout_end() { std::cout << IO_UNLOCK; }
+std::istream* g_input = &std::cin;
+std::ostream* g_output = &std::cout;
+void setup_global_io(std::istream& input, std::ostream& output) {
+    g_input = &input;
+    g_output = &output;
+}
+
 
 // Trampoline helper to avoid moving Logger to misc.h
 void start_logger(const std::string& fname) { Logger::start(fname); }

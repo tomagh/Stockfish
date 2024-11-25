@@ -49,15 +49,15 @@ template<typename... Ts>
 overload(Ts...) -> overload<Ts...>;
 
 void UCIEngine::print_info_string(const std::string& str) {
-    sync_cout_start();
+    std::stringstream ss;
     for (auto& line : split(str, "\n"))
     {
         if (!is_whitespace(line))
         {
-            std::cout << "info string " << line << '\n';
+            ss << "info string " << line << '\n';
         }
     }
-    sync_cout_end();
+    sync_cout << ss.str() << IO_UNLOCK;
 }
 
 UCIEngine::UCIEngine(int argc, char** argv) :
@@ -85,7 +85,7 @@ void UCIEngine::loop() {
     do
     {
         if (cli.argc == 1
-            && !getline(std::cin, cmd))  // Wait for an input or an end-of-file (EOF) indication
+            && !getline(*g_input, cmd))  // Wait for an input or an end-of-file (EOF) indication
             cmd = "quit";
 
         std::istringstream is(cmd);
@@ -241,8 +241,8 @@ void UCIEngine::bench(std::istream& args) {
 
         if (token == "go" || token == "eval")
         {
-            std::cerr << "\nPosition: " << cnt++ << '/' << num << " (" << engine.fen() << ")"
-                      << std::endl;
+            sync_cout << "\nPosition: " << cnt++ << '/' << num << " (" << engine.fen() << ")"
+                      << sync_endl;
             if (token == "go")
             {
                 Search::LimitsType limits = parse_limits(is);
@@ -276,10 +276,10 @@ void UCIEngine::bench(std::istream& args) {
 
     dbg_print();
 
-    std::cerr << "\n==========================="    //
+    sync_cout << "\n==========================="    //
               << "\nTotal time (ms) : " << elapsed  //
               << "\nNodes searched  : " << nodes    //
-              << "\nNodes/second    : " << 1000 * nodes / elapsed << std::endl;
+              << "\nNodes/second    : " << 1000 * nodes / elapsed << sync_endl;
 
     // reset callback, to not capture a dangling reference to nodesSearched
     engine.set_on_update_full([&](const auto& i) { on_update_full(i, options["UCI_ShowWDL"]); });
@@ -484,10 +484,12 @@ void UCIEngine::on_iter(const Engine::InfoIter& info) {
 }
 
 void UCIEngine::on_bestmove(std::string_view bestmove, std::string_view ponder) {
-    sync_cout << "bestmove " << bestmove;
+    std::stringstream ss;
+    ss << "bestmove " << bestmove;
     if (!ponder.empty())
-        std::cout << " ponder " << ponder;
-    std::cout << sync_endl;
+        ss << " ponder " << ponder;
+
+    sync_cout << ss.str() << sync_endl;
 }
 
 }  // namespace Stockfish
