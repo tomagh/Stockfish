@@ -584,7 +584,7 @@ int decompress_pairs(PairsData* d, uint64_t idx) {
     //       idx = k * d->span + idx % d->span    (2)
     //
     // So from (1) and (2) we can compute idx - I(K):
-    int diff = idx % d->span - d->span / 2;
+    int diff = static_cast<int>(idx % d->span) - static_cast<int>(d->span / 2);
 
     // Sum the above to offset to find the offset corresponding to our idx
     offset += diff;
